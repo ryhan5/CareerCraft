@@ -11,6 +11,16 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      keyframes: {
+        progress: {
+          '0%': { width: '0%' },
+          '100%': { width: '100%' }
+        }
+      },
+      animation: {
+        'bounce-slow': 'bounce 3s infinite',
+        progress: 'progress 3s ease-in-out infinite'
+      },
     },
   },
   plugins: [],
