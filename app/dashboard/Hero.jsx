@@ -97,7 +97,7 @@ const Hero = () => {
                     Go to Dashboard
                   </Link>
                   <Link
-                    href="/learning"
+                    href="/insights"
                     className="px-8 py-3 bg-white text-gray-700 rounded-lg font-semibold shadow-lg hover:shadow-xl border border-gray-300 hover:border-blue-300 transition-all duration-300"
                   >
                     Talk about your career
