@@ -88,6 +88,10 @@ export default function Dashboard() {
     );
   }
 
+  if (status === 'unauthenticated') {
+    return null; // You can also return a loading spinner here if desired
+  }
+
   const tabs = [
     { id: 'exams', label: 'Exams', icon: GraduationCap },
     { id: 'job-interviews', label: 'Job Interviews', icon: Briefcase },

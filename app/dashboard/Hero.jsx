@@ -440,10 +440,10 @@ const Hero = () => {
           <h3 className="text-xl text-gray-600 mb-8">Trusted by leading companies worldwide</h3>
           <div className="flex flex-wrap justify-center items-center gap-12 opacity-70 hover:opacity-100 transition-opacity duration-300">
             {/* Add partner logos here */}
-            {['Google', 'Microsoft', 'Amazon', 'Meta', 'Apple'].map((partner, index) => (
+            {['X', 'Y', 'Z', 'W', 'M'].map((partner, index) => (
               <div key={index} className="grayscale hover:grayscale-0 transition-all duration-300">
                 <Image
-                  src={`/partners/${partner.toLowerCase()}.png`}
+                  src={`/${partner.toLowerCase()}.jpg`}
                   alt={partner}
                   width={120}
                   height={40}
