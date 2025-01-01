@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+import SkillAssessment from '../components/SkillAssessment';
 import { useSession } from 'next-auth/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createCareerPrompt, promptTypes } from '../utils/prompts';
@@ -18,8 +20,11 @@ import {
   BookmarkIcon,
   ShareIcon,
   DocumentDuplicateIcon,
-  XMarkIcon
+  XMarkIcon,
+  ChartBarIcon,
+  BriefcaseIcon
 } from '@heroicons/react/24/outline';
+import { Line } from 'react-chartjs-2';
 
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
 
@@ -73,14 +78,6 @@ export default function CareerInsights() {
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
 
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [chatHistory]);
-
   const categories = [
     { id: 'all', name: 'All Topics', icon: SparklesIcon },
     { id: 'skills', name: 'Skills & Learning', icon: AcademicCapIcon },
@@ -88,6 +85,14 @@ export default function CareerInsights() {
     { id: 'interview', name: 'Interviews', icon: ChatBubbleLeftRightIcon },
     { id: 'saved', name: 'Saved', icon: BookmarkIcon },
   ];
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatHistory]);
 
   // Add the new helper functions
   const determineQuestionType = (input) => {
@@ -233,6 +238,78 @@ export default function CareerInsights() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-purple-50">
       <Header />
       
+      {/* Combined Header Section */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 space-y-4">
+          {/* Action Buttons */}
+          <div className="flex items-center justify-center space-x-4">
+            <Link
+              href="/dashboard"
+              className="px-6 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-200 flex items-center space-x-2"
+            >
+              <AcademicCapIcon className="w-5 h-5" />
+              <span>Explore Career Paths</span>
+            </Link>
+            <Link
+              href="/dashboard"
+              className="px-6 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-200 flex items-center space-x-2"
+            >
+              <ChartBarIcon className="w-5 h-5" />
+              <span>Take Skill Assessment</span>
+            </Link>
+            <Link
+              href="/jobs"
+              className="px-6 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-200 flex items-center space-x-2"
+            >
+              <BriefcaseIcon className="w-5 h-5" />
+              <span>Search Jobs</span>
+            </Link>
+          </div>
+
+          {/* Categories and Suggested Questions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Categories */}
+            <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-100">
+              <div className="grid grid-cols-3 gap-2">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all flex flex-col items-center ${
+                      selectedCategory === category.id
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <category.icon className="w-4 h-4 mb-1" />
+                    <span>{category.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Suggested Questions */}
+            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
+              <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
+                <LightBulbIcon className="w-5 h-5 mr-2 text-blue-600" />
+                Suggested Questions
+              </h3>
+              <div className="space-y-3">
+                {(suggestedPrompts[selectedCategory] || []).map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setPrompt(suggestion)}
+                    className="w-full text-left p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       {/* Toast Notification */}
       <AnimatePresence>
         {showToast && (
@@ -248,23 +325,103 @@ export default function CareerInsights() {
       </AnimatePresence>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-        {/* Enhanced Header Section */}
-        <div className="text-center mb-12">
-          <div className="inline-block">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              AI Career Advisor
-            </h1>
-            <div className="h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Sidebar Section */}
+        <div className="space-y-6">
+          {/* Skill Assessment */}
+          <SkillAssessment />
+
+          {/* Career Path Visualization */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-blue-900 flex items-center">
+                <ChartBarIcon className="w-5 h-5 mr-2 text-blue-600" />
+                Career Path
+              </h3>
+            </div>
+            <div className="h-64">
+              <Line 
+                data={{
+                  labels: ['Entry Level', 'Mid Level', 'Senior Level', 'Leadership'],
+                  datasets: [{
+                    label: 'Career Progression',
+                    data: [20, 40, 70, 90],
+                    borderColor: 'rgb(79, 70, 229)',
+                    backgroundColor: 'rgba(79, 70, 229, 0.5)',
+                    tension: 0.3,
+                  }]
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Your Career Path Progression',
+                    },
+                  },
+                  scales: {
+                    y: {
+                      min: 0,
+                      max: 100,
+                      ticks: {
+                        callback: function(value) {
+                          return value + '%';
+                        }
+                      }
+                    }
+                  }
+                }}
+              />
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div className="p-3 rounded-lg bg-blue-50 flex items-center">
+                <AcademicCapIcon className="w-5 h-5 mr-2 text-blue-600" />
+                <div>
+                  <p className="text-sm text-blue-900">Skills Mastered</p>
+                  <p className="font-semibold">12/20</p>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg bg-purple-50 flex items-center">
+                <BriefcaseIcon className="w-5 h-5 mr-2 text-purple-600" />
+                <div>
+                  <p className="text-sm text-purple-900">Career Milestones</p>
+                  <p className="font-semibold">3/5</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-xl text-blue-800 max-w-2xl mx-auto mt-4">
-            Get personalized career guidance powered by advanced AI
-          </p>
+
+          {/* Pro Tips Section */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <SparklesIcon className="w-5 h-5 mr-2" />
+              Pro Tips
+            </h3>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-center">
+                <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                Be specific about your goals and experience
+              </li>
+              <li className="flex items-center">
+                <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                Ask about specific technologies or roles
+              </li>
+              <li className="flex items-center">
+                <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                Include your target companies or industries
+              </li>
+            </ul>
+          </div>
+
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Chat Section */}
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 h-[600px] flex flex-col border border-gray-100">
+        {/* Chat Section */}
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 h-[600px] flex flex-col border border-gray-100">
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto mb-4 space-y-4 scroll-smooth">
               {chatHistory.length === 0 ? (
@@ -368,69 +525,6 @@ export default function CareerInsights() {
             </div>
           </div>
 
-          {/* Enhanced Sidebar */}
-          <div className="space-y-6">
-            {/* Category Selector */}
-            <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-100">
-              <div className="grid grid-cols-3 gap-2">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all flex flex-col items-center ${
-                      selectedCategory === category.id
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    <category.icon className="w-4 h-4 mb-1" />
-                    <span>{category.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Suggested Prompts */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-              <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
-                <LightBulbIcon className="w-5 h-5 mr-2 text-blue-600" />
-                Suggested Questions
-              </h3>
-              <div className="space-y-3">
-                {(suggestedPrompts[selectedCategory] || []).map((suggestion, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setPrompt(suggestion)}
-                    className="w-full text-left p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 transition-colors"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Pro Tips Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-              <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <SparklesIcon className="w-5 h-5 mr-2" />
-                Pro Tips
-              </h3>
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-center">
-                  <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                  Be specific about your goals and experience
-                </li>
-                <li className="flex items-center">
-                  <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                  Ask about specific technologies or roles
-                </li>
-                <li className="flex items-center">
-                  <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                  Include your target companies or industries
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
       </main>
     </div>
