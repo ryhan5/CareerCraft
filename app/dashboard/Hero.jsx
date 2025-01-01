@@ -390,21 +390,21 @@ const Hero = () => {
               {
                 name: "Sarah Johnson",
                 role: "Data Scientist at Google",
-                image: "/testimonial1.jpg",
+                image: "/one.jpg",
                 quote: "Transformed from marketing to data science in 6 months!",
                 increase: "+120% Salary"
               },
               {
                 name: "Michael Chen",
                 role: "Full Stack Developer",
-                image: "/testimonial2.jpg",
+                image: "/two.jpg",
                 quote: "Found my dream job through the platform's network.",
                 increase: "+85% Salary"
               },
               {
                 name: "Emma Williams",
                 role: "AI Engineer at Microsoft",
-                image: "/testimonial3.jpg",
+                image: "/three.jpg",
                 quote: "The mentorship program was a game-changer for me.",
                 increase: "+150% Salary"
               }
