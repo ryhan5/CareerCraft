@@ -1,0 +1,10 @@
+{
+  "build": {
+    "env": {
+      "NODE_VERSION": "18.x"
+    },
+    "scripts": {
+      "install": "npm install --legacy-peer-deps"
+    }
+  }
+}

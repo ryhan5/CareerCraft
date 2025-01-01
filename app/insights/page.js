@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import SkillAssessment from '../components/SkillAssessment';
 import { useSession } from 'next-auth/react';
@@ -24,19 +24,8 @@ import {
   ChartBarIcon,
   BriefcaseIcon
 } from '@heroicons/react/24/outline';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart } from 'chart.js/auto';
 
-// Register the required components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
 
@@ -89,6 +78,60 @@ export default function CareerInsights() {
   const [toastMessage, setToastMessage] = useState('');
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
+
+  const initChart = useCallback(() => {
+    if (chartRef.current) {
+      const ctx = chartRef.current.getContext('2d');
+      chartInstance.current = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Entry Level', 'Mid Level', 'Senior Level', 'Leadership'],
+          datasets: [{
+            label: 'Career Progression',
+            data: [20, 40, 70, 90],
+            borderColor: 'rgb(79, 70, 229)',
+            backgroundColor: 'rgba(79, 70, 229, 0.5)',
+            tension: 0.3,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Your Career Path Progression',
+            },
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    initChart();
+    return () => {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
+      }
+    };
+  }, [initChart]);
 
   const categories = [
     { id: 'all', name: 'All Topics', icon: SparklesIcon },
@@ -353,42 +396,7 @@ export default function CareerInsights() {
               </h3>
             </div>
             <div className="h-64">
-              <Line 
-                data={{
-                  labels: ['Entry Level', 'Mid Level', 'Senior Level', 'Leadership'],
-                  datasets: [{
-                    label: 'Career Progression',
-                    data: [20, 40, 70, 90],
-                    borderColor: 'rgb(79, 70, 229)',
-                    backgroundColor: 'rgba(79, 70, 229, 0.5)',
-                    tension: 0.3,
-                  }]
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      position: 'top',
-                    },
-                    title: {
-                      display: true,
-                      text: 'Your Career Path Progression',
-                    },
-                  },
-                  scales: {
-                    y: {
-                      min: 0,
-                      max: 100,
-                      ticks: {
-                        callback: function(value) {
-                          return value + '%';
-                        }
-                      }
-                    }
-                  }
-                }}
-              />
+              <canvas ref={chartRef} />
             </div>
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div className="p-3 rounded-lg bg-blue-50 flex items-center">
