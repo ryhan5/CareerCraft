@@ -1,4 +1,5 @@
-import NextAuth from "next-auth"
+import NextAuth from "next-auth";
+import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from 'bcryptjs'
@@ -82,15 +83,21 @@ const authOptions = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // Always redirect to dashboard after successful sign in
+      return `${baseUrl}/dashboard`;
+    },
   },
   pages: {
     signIn: "/auth/signin",
+    error: '/auth/error',
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST } 
+export { handler as GET, handler as POST };
